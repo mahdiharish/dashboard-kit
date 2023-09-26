@@ -1,4 +1,86 @@
+import { useState } from "react"
+import { mockUsers, User } from "./mockData";
+
 export default function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [authenticationError, setAuthenticationError] = useState("");
+
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+    return emailRegex.test(email);
+  };
+
+  const validatePassword = (password: string) => {
+    // Password should be at least 8 characters and contain at least one letter and one digit
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+    return passwordRegex.test(password);
+  };
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newEmail = e.target.value;
+    setEmail(newEmail);
+
+    // Validate email format
+    if (!validateEmail(newEmail)) {
+      setEmailError("Invalid email format!");
+    } else {
+      setEmailError("");
+    }
+  };
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newPassword = e.target.value;
+    setPassword(newPassword);
+
+    // Validate password format
+    if (!validatePassword(newPassword)) {
+      setPasswordError(
+        "Password must be at least 8 characters and contain at least one letter and one digit."
+      );
+    } else {
+      setPasswordError("");
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setEmailError("");
+    setPasswordError("");
+    setAuthenticationError("");
+
+    if (!email) {
+      setEmailError("Email is required!");
+    } else if (!validateEmail(email)) {
+      setEmailError("Invalid email format!");
+    }
+
+    if (!password) {
+      setPasswordError("Password is required!");
+    } else if (!validatePassword(password)) {
+      setPasswordError(
+        "Password must be at least 8 characters and contain at least one letter and one digit."
+      );
+    }
+
+    if (emailError || passwordError) {
+      // Validation failed
+      return;
+    }
+
+    const user = mockUsers.find(
+      (u) => u.email === email && u.password === password
+    );
+
+    if (user) {
+      console.log("Authentication successful!");
+    } else {
+      setAuthenticationError("Invalid email or password!");
+    }
+  };
+
   return (
     <>
       <div className="flex min-h-full flex-1 flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -15,13 +97,14 @@ export default function Login() {
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
           <div className="bg-white px-6 py-12 shadow sm:rounded-lg sm:px-12">
-            <form className="space-y-6" action="#" method="POST">
+            <form className="space-y-6" onSubmit={handleSubmit}>
               <div>
                 <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
                   Email address
                 </label>
                 <div className="mt-2">
                   <input
+                    onChange={handleEmailChange}
                     id="email"
                     name="email"
                     type="email"
@@ -29,6 +112,7 @@ export default function Login() {
                     required
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                   />
+                  {emailError && <div className="text-red-600">{emailError}</div>}
                 </div>
               </div>
 
@@ -38,6 +122,7 @@ export default function Login() {
                 </label>
                 <div className="mt-2">
                   <input
+                  onChange={handlePasswordChange}
                     id="password"
                     name="password"
                     type="password"
@@ -45,6 +130,7 @@ export default function Login() {
                     required
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                   />
+                  {passwordError && <div className="text-red-600">{passwordError}</div>}
                 </div>
               </div>
 
