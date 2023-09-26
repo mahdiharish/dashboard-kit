@@ -1,11 +1,12 @@
 import Login from './components/Login'
 import './App.css'
+import Dashboard from './components/Dashboard'
 
 function App() {
 
 
   return (
-      <Login />
+      <Dashboard />
   )
 }
 
